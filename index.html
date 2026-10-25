@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta property="og:title" content="یه بستنی برای تو 🍦">
+<meta property="og:description" content="بزن روش 💕">
+<style>body{margin:0}</style><title>بستنی برای عشقم</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lalezar&family=Vazirmatn:wght@400;600&display=swap">
+<style>
+  /* Layout: one centered postcard-sized scene; tap the cone to take bites, last bite opens the note. Single pastel look on purpose. */
+  :root {
+    --sky: #ffe3ec;
+    --sky-2: #fff3e6;
+    --ink: #5a2a3a;
+    --berry: #e8577e;
+    --cream: #fff8ef;
+    --cone: #e2a35c;
+    --cone-dark: #c07f3c;
+    --mint: #9be3c9;
+    --display: "Lalezar", "Vazirmatn", Tahoma, sans-serif;
+    --body: "Vazirmatn", Tahoma, "Segoe UI", sans-serif;
+    color-scheme: light;
+  }
+  html, body { height: 100%; }
+  body {
+    background: linear-gradient(170deg, var(--sky), var(--sky-2));
+    color: var(--ink);
+    font-family: var(--body);
+    direction: rtl;
+    overflow: hidden;
+  }
+  .stage {
+    position: relative;
+    min-height: 100%;
+    display: grid;
+    place-items: center;
+    padding-block: 24px;
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+    box-sizing: border-box;
+    text-align: center;
+  }
+  .card { display: grid; gap: 14px; justify-items: center; max-width: 420px; position: relative; z-index: 2; }
+  h1 {
+    font-family: var(--display);
+    font-weight: 400;
+    font-size: clamp(2.4rem, 11vw, 3.6rem);
+    line-height: 1.1;
+    margin: 0;
+    color: var(--berry);
+    text-wrap: balance;
+    text-shadow: 0 3px 0 #fff;
+  }
+  .hint { margin: 0; font-size: 1rem; opacity: .75; min-height: 1.6em; }
+  button.cone {
+    all: unset;
+    cursor: pointer;
+    width: min(64vw, 240px);
+    aspect-ratio: 3 / 5;
+    max-width: 100%;
+    display: block;
+    transition: transform .15s ease;
+    -webkit-tap-highlight-color: transparent;
+  }
+  button.cone:active { transform: scale(.96) rotate(-2deg); }
+  button.cone:focus-visible { outline: 3px dashed var(--berry); outline-offset: 8px; border-radius: 24px; }
+  button.cone svg { width: 100%; height: 100%; overflow: visible; }
+  .scoop { transition: transform .35s cubic-bezier(.3,1.6,.5,1), opacity .3s; transform-origin: 120px 150px; }
+  .scoop.gone { transform: scale(0) translateY(40px); opacity: 0; }
+  .bob { animation: bob 3s ease-in-out infinite; transform-origin: center bottom; }
+  @keyframes bob { 50% { transform: translateY(-8px) rotate(1.5deg); } }
+
+  .note {
+    background: var(--cream);
+    border-radius: 22px;
+    padding: 18px 22px;
+    box-shadow: 0 10px 30px rgba(232, 87, 126, .22);
+    font-size: 1.15rem;
+    line-height: 1.9;
+    max-width: 340px;
+  }
+  .note strong { font-family: var(--display); font-weight: 400; color: var(--berry); font-size: 1.5rem; display: block; }
+  .again { all: unset; cursor: pointer; font-size: .95rem; color: var(--berry); text-decoration: underline; text-underline-offset: 4px; }
+  .again:focus-visible { outline: 2px solid var(--berry); outline-offset: 4px; }
+
+  .hearts { position: fixed; inset: 0; pointer-events: none; z-index: 1; overflow: hidden; }
+  .heart {
+    position: absolute; bottom: -40px;
+    font-size: var(--s, 22px);
+    animation: rise var(--d, 7s) linear infinite;
+    animation-delay: var(--delay, 0s);
+    opacity: .85;
+  }
+  @keyframes rise {
+    0% { transform: translateY(0) translateX(0) rotate(0); opacity: 0; }
+    10% { opacity: .85; }
+    100% { transform: translateY(-115vh) translateX(var(--drift, 20px)) rotate(25deg); opacity: 0; }
+  }
+  .burst { position: fixed; pointer-events: none; z-index: 3; font-size: 22px; animation: pop .9s ease-out forwards; }
+  @keyframes pop { to { transform: translate(var(--x), var(--y)) scale(.4); opacity: 0; } }
+
+  @media (prefers-reduced-motion: reduce) {
+    .bob, .heart { animation: none; }
+    .heart { display: none; }
+    .scoop { transition: none; }
+  }
+</style>
+
+</head><body><div class="hearts" id="hearts" aria-hidden="true"></div>
+<main class="stage">
+  <div class="card">
+    <h1 id="title">یه بستنی برای تو 🍦</h1>
+    <p class="hint" id="hint">روی بستنی بزن و گاز بزن!</p>
+
+    <button class="cone" id="cone" aria-label="گاز زدن بستنی">
+      <svg viewBox="0 0 240 400" class="bob" aria-hidden="true">
+        <!-- cone -->
+        <path d="M60 200 L120 385 L180 200 Z" fill="var(--cone)"/>
+        <path d="M70 215 L170 215 M78 245 L162 245 M88 275 L152 275 M98 305 L142 305 M108 335 L132 335" stroke="var(--cone-dark)" stroke-width="4" stroke-linecap="round" fill="none"/>
+        <path d="M80 200 L130 360 M110 200 L145 312 M140 200 L158 258 M160 200 L110 360 M130 200 L95 312 M100 200 L82 258" stroke="var(--cone-dark)" stroke-width="3" opacity=".55" fill="none"/>
+        <!-- scoops: bottom to top -->
+        <g class="scoop" data-n="1">
+          <circle cx="120" cy="190" r="66" fill="#fff4dc"/>
+          <path d="M56 196 q14 22 30 4 q16 20 34 2 q18 20 34 -2 q16 20 32 -4" fill="#fff4dc"/>
+          <circle cx="98" cy="172" r="4" fill="#d9b98a"/><circle cx="140" cy="180" r="4" fill="#d9b98a"/><circle cx="120" cy="160" r="3" fill="#d9b98a"/>
+        </g>
+        <g class="scoop" data-n="2">
+          <circle cx="120" cy="125" r="56" fill="#ffb3c7"/>
+          <path d="M66 132 q12 18 26 4 q14 16 28 2 q14 16 28 -2 q14 16 26 -4" fill="#ffb3c7"/>
+          <ellipse cx="100" cy="108" rx="12" ry="7" fill="#fff" opacity=".45"/>
+        </g>
+        <g class="scoop" data-n="3">
+          <circle cx="120" cy="70" r="46" fill="var(--mint)"/>
+          <path d="M76 76 q10 14 22 3 q12 13 22 1 q12 13 22 -1 q10 14 22 -3" fill="var(--mint)"/>
+          <ellipse cx="104" cy="56" rx="10" ry="6" fill="#fff" opacity=".5"/>
+          <!-- cherry -->
+          <path d="M122 26 q8 -18 22 -22" stroke="#6b8f3a" stroke-width="3" fill="none" stroke-linecap="round"/>
+          <circle cx="120" cy="30" r="12" fill="var(--berry)"/>
+          <circle cx="116" cy="26" r="3.5" fill="#fff" opacity=".7"/>
+        </g>
+      </svg>
+    </button>
+
+    <div class="note" id="note" hidden>
+      <strong>نوش جان عشقم 💕</strong>
+      از همه‌ی بستنی‌های دنیا شیرین‌تری.<br>
+      این یکی رو تموم کردی، بقیه‌ش طلبت،<br>
+      با هم می‌خوریمش 🍓
+    </div>
+    <button class="again" id="again" hidden>یه بستنی دیگه 🍦</button>
+  </div>
+</main>
+
+<script>
+  const cone = document.getElementById('cone');
+  const hint = document.getElementById('hint');
+  const note = document.getElementById('note');
+  const again = document.getElementById('again');
+  const title = document.getElementById('title');
+  const scoops = [...document.querySelectorAll('.scoop')].reverse(); // top first
+  const lines = ['اوووم 😋', 'یکی دیگه!', 'آخریشه... 🥹'];
+  let bites = 0;
+
+  function burst(x, y) {
+    const icons = ['💗', '💖', '✨', '🍓', '💕'];
+    for (let i = 0; i < 10; i++) {
+      const s = document.createElement('span');
+      s.className = 'burst';
+      s.textContent = icons[i % icons.length];
+      const a = Math.random() * Math.PI * 2, r = 60 + Math.random() * 90;
+      s.style.left = x + 'px'; s.style.top = y + 'px';
+      s.style.setProperty('--x', Math.cos(a) * r + 'px');
+      s.style.setProperty('--y', Math.sin(a) * r - 40 + 'px');
+      document.body.appendChild(s);
+      setTimeout(() => s.remove(), 950);
+    }
+  }
+
+  cone.addEventListener('click', (e) => {
+    if (bites >= scoops.length) return;
+    scoops[bites].classList.add('gone');
+    hint.textContent = lines[bites];
+    const r = cone.getBoundingClientRect();
+    burst(e.clientX || r.left + r.width / 2, e.clientY || r.top + r.height / 3);
+    bites++;
+    if (bites === scoops.length) {
+      setTimeout(() => {
+        cone.hidden = true;
+        hint.hidden = true;
+        title.textContent = 'تموم شد! 🥰';
+        note.hidden = false;
+        again.hidden = false;
+        burst(innerWidth / 2, innerHeight / 2);
+      }, 400);
+    }
+  });
+
+  again.addEventListener('click', () => {
+    bites = 0;
+    scoops.forEach((s) => s.classList.remove('gone'));
+    cone.hidden = false; hint.hidden = false; note.hidden = true; again.hidden = true;
+    title.textContent = 'یه بستنی برای تو 🍦';
+    hint.textContent = 'روی بستنی بزن و گاز بزن!';
+  });
+
+  const hearts = document.getElementById('hearts');
+  ['💗', '💕', '🤍', '💖', '🍦'].forEach((h, i) => {
+    for (let k = 0; k < 3; k++) {
+      const el = document.createElement('span');
+      el.className = 'heart';
+      el.textContent = h;
+      el.style.left = Math.random() * 100 + '%';
+      el.style.setProperty('--s', 16 + Math.random() * 20 + 'px');
+      el.style.setProperty('--d', 6 + Math.random() * 6 + 's');
+      el.style.setProperty('--delay', -Math.random() * 10 + 's');
+      el.style.setProperty('--drift', (Math.random() * 80 - 40) + 'px');
+      hearts.appendChild(el);
+    }
+  });
+</script>
+
+</body>
+</html>
